@@ -1,0 +1,24 @@
+# Construct a schema using GraphQL schema language
+type User {
+  id: ID!
+  email: String!
+  username: String!
+  password: String!
+  secret: String
+}
+
+type Query {
+  users: [User]
+}
+
+type Mutation {
+  register(email: String!, username: String!, password: String!): User!
+  login(email: String!, password: String!): String
+  changePassword(
+    email: String!
+    oldPassword: String!
+    newPassword: String!
+  ): String
+  # enableTwoFactorAuth(email: String!): String
+  # verifyTwoFactorAuth(email: String!, token: String!): String
+}
