@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "server.ts",
   "author": "Jeyhun Abilov",
+  "repository": "https://github.com/Abilov599/User-Auth-with-GraphQL-ApolloServer",
   "type": "module",
   "scripts": {
     "compile": "tsc",
