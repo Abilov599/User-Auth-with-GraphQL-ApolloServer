@@ -4,7 +4,8 @@ type User {
   email: String!
   username: String!
   password: String!
-  secret: String
+  secret: String!
+  qrCodeUrl: String!
 }
 
 type Query {

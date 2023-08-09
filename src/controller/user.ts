@@ -20,37 +20,31 @@ async function register(_, { email, username, password }) {
   if (existingUser) {
     throw new Error("Username or email already taken");
   }
-  // Generate a random secret key for the user
-  const secret = speakeasy.generateSecret({ length: 20 }).base32;
   // Hash users password
   const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    // Generate a random secret key for the user
+    const secret = speakeasy.generateSecret();
+    // Generate QR code image and provide the URL
+    const qrCodeImageUrl = await qrcode.toDataURL(secret.otpauth_url);
 
-  // Generate a QR code URL for the user's secret
-  const otpAuthUrl = speakeasy.otpauthURL({
-    secret,
-    label: username,
-    issuer: "Jeyhun's Auth App",
-  });
-
-  // Generate QR code image and send to user
-  const qrCodeImageUrl = await qrcode.toDataURL(otpAuthUrl);
-
-  const user: UserDocument = new User({
-    email,
-    username,
-    password: hashedPassword,
-    secret,
-    qrCodeUrl: qrCodeImageUrl,
-  });
-
-  // Save the user to the database
-  await user.save();
-
-  return qrCodeImageUrl;
+    const user: UserDocument = new User({
+      email,
+      username,
+      password: hashedPassword,
+      secret: secret.base32,
+      qrCodeUrl: qrCodeImageUrl,
+    });
+    // Save the user to the database
+    await user.save();
+    return qrCodeImageUrl;
+  } catch (error) {
+    throw new Error("Error generating secret");
+  }
 }
 
 // User login with JWT
-async function login(_, { email, password }, context) {
+async function login(_, { email, password, oneTimeCode }, context) {
   if (!email || !password) {
     throw new Error(
       "Missing required fields. Please provide email or username, and password."
@@ -64,31 +58,30 @@ async function login(_, { email, password }, context) {
 
   // Compare the provided password with the stored hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  // // Verify 2FA code
-  // const verified = speakeasy.totp.verify({
-  //   secret: user.secret,
-  //   encoding: "base32",
-  //   token: args.twoFactorCode,
-  // });
-
-  // if (!verified) {
-  //   throw new Error("Invalid two-factor code");
-  // }
-
-  // If passwords match, generate a JWT token and return it
-  if (isPasswordValid) {
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
-      expiresIn: "1h",
-    });
-    context.res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24, // Cookie expiry time in milliseconds (1 day)
-    });
-    return "Login successful";
-  } else {
+  if (!isPasswordValid) {
     throw new Error("Invalid password");
   }
+
+  // Verify the one-time code using the user's secret key
+  const verified = speakeasy.totp.verify({
+    secret: user.secret,
+    encoding: "base32",
+    token: oneTimeCode,
+  });
+
+  if (!verified) {
+    throw new Error("Invalid one-time code");
+  }
+
+  // If passwords match, generate a JWT token and return it
+  const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
+    expiresIn: "1h",
+  });
+  context.res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24, // Cookie expiry time in milliseconds (1 day)
+  });
+  return "Login successful";
 }
 
 export { register, login };
