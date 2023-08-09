@@ -26,7 +26,6 @@ const server = new ApolloServer({
 await server.start();
 
 app.use(
-  "/graphql",
   cors(),
   cookieParser(),
   express.json(),
@@ -40,6 +39,6 @@ const port = process.env.PORT;
 
 connectDB().then(() =>
   httpServer.listen({ port }, () =>
-    console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
+    console.log(`🚀 Server ready at http://localhost:${port}`)
   )
 );
