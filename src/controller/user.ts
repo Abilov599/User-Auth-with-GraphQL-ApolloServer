@@ -2,6 +2,8 @@ import { User, UserDocument } from "../model/user.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import speakeasy from "speakeasy";
+import qrcode from "qrcode";
 dotenv.config();
 
 // User registration with hashing password
@@ -18,18 +20,30 @@ async function register(_, { email, username, password }) {
   if (existingUser) {
     throw new Error("Username or email already taken");
   }
-
+  // Generate a random secret key for the user
+  const secret = speakeasy.generateSecret({ length: 20 }).base32;
+  // Hash users password
   const hashedPassword = await bcrypt.hash(password, 10);
   const user: UserDocument = new User({
     email,
     username,
     password: hashedPassword,
+    secret,
   });
 
   // Save the user to the database
-  const registeredUser = await user.save();
-  registeredUser.password = "🫣";
-  return registeredUser;
+  await user.save();
+  // Generate a QR code URL for the user's secret
+  const otpAuthUrl = speakeasy.otpauthURL({
+    secret: secret,
+    label: user.username,
+    issuer: "Jeyhun's Auth App",
+  });
+
+  // Generate QR code image and send to user
+  const qrCodeImageUrl = await qrcode.toDataURL(otpAuthUrl);
+
+  return qrCodeImageUrl;
 }
 
 // User login with JWT
@@ -47,6 +61,17 @@ async function login(_, { email, password }, context) {
 
   // Compare the provided password with the stored hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  // // Verify 2FA code
+  // const verified = speakeasy.totp.verify({
+  //   secret: user.secret,
+  //   encoding: "base32",
+  //   token: args.twoFactorCode,
+  // });
+
+  // if (!verified) {
+  //   throw new Error("Invalid two-factor code");
+  // }
 
   // If passwords match, generate a JWT token and return it
   if (isPasswordValid) {
