@@ -33,7 +33,7 @@ async function register(_, { email, username, password }) {
 }
 
 // User login with JWT
-async function login(_, { email, password }) {
+async function login(_, { email, password }, context) {
   if (!email || !password) {
     throw new Error(
       "Missing required fields. Please provide email or username, and password."
@@ -53,7 +53,11 @@ async function login(_, { email, password }) {
     const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
       expiresIn: "1h",
     });
-    return token;
+    context.res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // Cookie expiry time in milliseconds (1 day)
+    });
+    return "Login successful";
   } else {
     throw new Error("Invalid password");
   }
