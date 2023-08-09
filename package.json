@@ -29,7 +29,6 @@
     "@types/morgan": "^1.9.4",
     "@types/node": "^20.4.8",
     "@types/speakeasy": "^2.0.7",
-    "morgan": "^1.10.0",
     "typescript": "^5.1.6"
   }
 }

@@ -6,7 +6,6 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
-import morgan from "morgan";
 import connectDB from "./database/index.js";
 import resolvers from "./graphql/resolvers/user.js";
 
@@ -25,8 +24,8 @@ const server = new ApolloServer({
 });
 await server.start();
 
-app.use(cors(), express.json(), expressMiddleware(server), morgan("dev"));
-dotenv.config()
+app.use(cors(), express.json(), expressMiddleware(server));
+dotenv.config();
 
 const port = process.env.PORT;
 
