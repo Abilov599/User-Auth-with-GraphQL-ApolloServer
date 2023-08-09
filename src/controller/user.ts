@@ -103,4 +103,31 @@ async function authUser(_, __, context) {
   return "Authenticated";
 }
 
-export { register, login, authUser };
+async function changePassword(_, { email, oldPassword, newPassword }) {
+  if (!email || !oldPassword || !newPassword) {
+    throw new Error(
+      "Missing required fields. Please provide email, oldPassword, and newPassword."
+    );
+  }
+  if (oldPassword === newPassword) {
+    throw new Error("Don't use same password");
+  }
+  // Find the user by email
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  // Validate the old password
+  const validPassword = await bcrypt.compare(oldPassword, user.password);
+  if (!validPassword) {
+    throw new Error("Invalid password");
+  }
+  // Hash and save the new password
+  const newHashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = newHashedPassword;
+  await user.save();
+
+  return "Password changed successfully";
+}
+
+export { register, login, authUser, changePassword };
