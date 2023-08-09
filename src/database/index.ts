@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
-const MONGODB_URL =
-  "mongodb+srv://abilovv599:cemi2002@cluster0.bh7quof.mongodb.net/graphql-authUser";
+const PASSWORD = process.env.PASSWORD;
+const MONGODB_URI = process.env.MONGODB_URI.replace("<password>", PASSWORD);
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URL);
+    await mongoose.connect(MONGODB_URI);
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);

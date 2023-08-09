@@ -5,6 +5,7 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import express from "express";
 import http from "http";
 import cors from "cors";
+import dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "./database/index.js";
 import resolvers from "./graphql/resolvers/user.js";
@@ -25,9 +26,12 @@ const server = new ApolloServer({
 await server.start();
 
 app.use(cors(), express.json(), expressMiddleware(server), morgan("dev"));
+dotenv.config()
+
+const PORT = process.env.PORT;
 
 connectDB().then(() =>
-  httpServer.listen({ port: 8000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:8000`)
+  httpServer.listen({ PORT }, () =>
+    console.log(`🚀 Server ready at http://localhost:${PORT}`)
   )
 );
