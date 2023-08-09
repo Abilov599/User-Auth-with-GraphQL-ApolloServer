@@ -7,5 +7,5 @@
 * or You can clone this project and run locally
 * `yarn install`
 * `yarn run start`
-* visit `http://localhost:8000/graphql` for GraphQL playground
+* visit `http://localhost:8000` for GraphQL playground
 
