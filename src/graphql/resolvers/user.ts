@@ -1,5 +1,5 @@
 import { User } from "../../model/user.js";
-import { register } from "../../controller/user.js";
+import { register, login } from "../../controller/user.js";
 
 // Provide resolver functions for the GraphQL schema
 const resolvers = {
@@ -8,36 +8,12 @@ const resolvers = {
   },
   Mutation: {
     register,
+    login,
   },
 };
 
 export default resolvers;
 
-// Sample data - You should integrate with a database (e.g., MongoDB)
-// interface User {
-//   id: string;
-//   name: string;
-//   email: string;
-//   password: string;
-//   secret: string;
-// }
-
-// login: async ({ email, password }: { email: string; password: string }) => {
-//   // Find the user by email
-//   const user = await User.findOne({ email });
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
-
-//   // Validate the password
-//   const validPassword = await bcrypt.compare(password, user.password);
-//   if (!validPassword) {
-//     throw new Error("Invalid password");
-//   }
-
-//   // Create a JWT token and return it to the client
-//   return jwt.sign({ userId: user.id }, "secret", { expiresIn: "1h" });
-// },
 // changePassword: async ({
 //   email,
 //   oldPassword,

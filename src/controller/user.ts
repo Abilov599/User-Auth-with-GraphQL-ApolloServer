@@ -1,6 +1,10 @@
 import { User, UserDocument } from "../model/user.js";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+dotenv.config();
 
+// User registration with hashing password
 async function register(_, { email, username, password }) {
   if (!email || !username || !password) {
     throw new Error(
@@ -28,4 +32,31 @@ async function register(_, { email, username, password }) {
   return registeredUser;
 }
 
-export { register };
+// User login with JWT
+async function login(_, { email, password }) {
+  if (!email || !password) {
+    throw new Error(
+      "Missing required fields. Please provide email or username, and password."
+    );
+  }
+  // Check if the username or email already exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User with this email not found");
+  }
+
+  // Compare the provided password with the stored hashed password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  // If passwords match, generate a JWT token and return it
+  if (isPasswordValid) {
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
+      expiresIn: "1h",
+    });
+    return token;
+  } else {
+    throw new Error("Invalid password");
+  }
+}
+
+export { register, login };
