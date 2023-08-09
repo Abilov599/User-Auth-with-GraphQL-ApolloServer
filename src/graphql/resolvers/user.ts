@@ -4,7 +4,7 @@ import { register } from "../../controller/user.js";
 // Provide resolver functions for the GraphQL schema
 const resolvers = {
   Query: {
-    users: () => User.find(),
+    getAllUsers: () => User.find(),
   },
   Mutation: {
     register,
@@ -12,7 +12,6 @@ const resolvers = {
 };
 
 export default resolvers;
-
 
 // Sample data - You should integrate with a database (e.g., MongoDB)
 // interface User {
