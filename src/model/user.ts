@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 // Define the interface for the User document
 interface UserDocument extends Document {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   password: string;
