@@ -7,6 +7,7 @@ interface UserDocument extends Document {
   email: string;
   password: string;
   secret: string;
+  qrCodeUrl: string;
 }
 
 // Define the User schema
@@ -16,6 +17,7 @@ const userSchema = new Schema<UserDocument>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     secret: { type: String, required: true },
+    qrCodeUrl: { type: String, required: true },
   },
   { timestamps: true }
 );

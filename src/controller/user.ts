@@ -24,24 +24,27 @@ async function register(_, { email, username, password }) {
   const secret = speakeasy.generateSecret({ length: 20 }).base32;
   // Hash users password
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user: UserDocument = new User({
-    email,
-    username,
-    password: hashedPassword,
-    secret,
-  });
 
-  // Save the user to the database
-  await user.save();
   // Generate a QR code URL for the user's secret
   const otpAuthUrl = speakeasy.otpauthURL({
-    secret: secret,
-    label: user.username,
+    secret,
+    label: username,
     issuer: "Jeyhun's Auth App",
   });
 
   // Generate QR code image and send to user
   const qrCodeImageUrl = await qrcode.toDataURL(otpAuthUrl);
+
+  const user: UserDocument = new User({
+    email,
+    username,
+    password: hashedPassword,
+    secret,
+    qrCodeUrl: qrCodeImageUrl,
+  });
+
+  // Save the user to the database
+  await user.save();
 
   return qrCodeImageUrl;
 }
