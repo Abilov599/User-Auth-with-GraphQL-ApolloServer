@@ -28,10 +28,10 @@ await server.start();
 app.use(cors(), express.json(), expressMiddleware(server), morgan("dev"));
 dotenv.config()
 
-const PORT = process.env.PORT;
+const port = process.env.PORT;
 
 connectDB().then(() =>
-  httpServer.listen({ PORT }, () =>
-    console.log(`🚀 Server ready at http://localhost:${PORT}`)
+  httpServer.listen({ port }, () =>
+    console.log(`🚀 Server ready at http://localhost:${port}`)
   )
 );
