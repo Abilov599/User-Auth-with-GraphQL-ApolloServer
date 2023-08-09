@@ -3,6 +3,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import express from "express";
+import cookieParser from "cookie-parser";
 import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -24,13 +25,21 @@ const server = new ApolloServer({
 });
 await server.start();
 
-app.use(cors(), express.json(), expressMiddleware(server));
+app.use(
+  "/graphql",
+  cors(),
+  cookieParser(),
+  express.json(),
+  expressMiddleware(server, {
+    context: async ({ req, res }) => ({ req, res }),
+  })
+);
 dotenv.config();
 
 const port = process.env.PORT;
 
 connectDB().then(() =>
   httpServer.listen({ port }, () =>
-    console.log(`🚀 Server ready at http://localhost:${port}`)
+    console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
   )
 );
