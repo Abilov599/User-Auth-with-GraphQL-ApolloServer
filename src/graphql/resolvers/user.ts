@@ -42,37 +42,8 @@ export default resolvers;
 
 //   return "Password changed successfully";
 // },
-// enableTwoFactorAuth: ({ email }: { email: string }) => {
-//   // Replace this with proper user lookup
-//   const user = User.find((user: User) => user.email === email);
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
 
-//   // Generate a new secret for two-factor authentication
-//   const secret = speakeasy.generateSecret().base32;
-//   user["secret"] = secret;
-//   return secret;
-// },
-// verifyTwoFactorAuth: ({
-//   email,
-//   token,
-// }: {
-//   email: string;
-//   token: string;
-// }) => {
-//   // Replace this with proper user lookup
-//   const user = User.find((user: User) => user.email === email);
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
 
-//   // Verify the token with the stored secret
-//   const verified = speakeasy.totp.verify({
-//     secret: user["secret"],
-//     encoding: "base32",
-//     token,
-//   });
 
 //   return verified
 //     ? "Two-factor authentication successful"
