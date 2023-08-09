@@ -1,5 +1,5 @@
 import { User } from "../../model/user.js";
-import { register, login } from "../../controller/user.js";
+import { register, login, authUser } from "../../controller/user.js";
 
 // Provide resolver functions for the GraphQL schema
 const resolvers = {
@@ -9,6 +9,7 @@ const resolvers = {
   Mutation: {
     register,
     login,
+    authUser,
   },
 };
 
@@ -42,8 +43,6 @@ export default resolvers;
 
 //   return "Password changed successfully";
 // },
-
-
 
 //   return verified
 //     ? "Two-factor authentication successful"

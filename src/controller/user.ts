@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
+const { sign, verify } = jwt;
 dotenv.config();
 
 // User registration with hashing password
@@ -74,7 +75,7 @@ async function login(_, { email, password, oneTimeCode }, context) {
   }
 
   // If passwords match, generate a JWT token and return it
-  const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
+  const token = sign({ userId: user._id }, process.env.SECRET, {
     expiresIn: "1h",
   });
   context.res.cookie("token", token, {
@@ -84,4 +85,22 @@ async function login(_, { email, password, oneTimeCode }, context) {
   return "Login successful";
 }
 
-export { register, login };
+async function authUser(_, __, context) {
+  const token = context.req.cookies["token"];
+  if (!token) {
+    throw new Error("Authorization token missing");
+  }
+  const decoded = verify(token, process.env.SECRET) as {
+    userId: string;
+  };
+  if (!decoded.userId) {
+    throw new Error("Invalid token payload");
+  }
+  const user = await User.findOne({ _id: decoded.userId });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return "Authenticated";
+}
+
+export { register, login, authUser };
