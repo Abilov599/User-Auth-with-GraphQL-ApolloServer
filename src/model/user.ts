@@ -15,7 +15,7 @@ const userSchema = new Schema<UserDocument>(
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    secret: { type: String, default: "" },
+    secret: { type: String, required: true },
   },
   { timestamps: true }
 );
