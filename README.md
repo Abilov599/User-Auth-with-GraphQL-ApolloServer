@@ -9,6 +9,8 @@
 * `yarn run start`
 * visit `http://localhost:8000` for GraphQL playground
 
+## Testing project
+
 *  Install Google Authenticator on your Phone
 *  After visiting GraphQL playground select Registration mutation and type your data, then click on register button
 *  Copy response URL and paste in new browser tab.
