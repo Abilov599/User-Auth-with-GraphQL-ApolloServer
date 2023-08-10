@@ -36,11 +36,13 @@ async function register(_, { email, username, password }) {
       secret: secret.base32,
       qrCodeUrl: qrCodeImageUrl,
     });
+
     // Save the user to the database
     await user.save();
+
     return qrCodeImageUrl;
   } catch (error) {
-    throw new Error("Error generating secret");
+    throw new Error(error);
   }
 }
 
