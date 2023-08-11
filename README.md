@@ -16,4 +16,4 @@
 *  Copy response URL and paste in new browser tab.
 *  Scan QR Code and add onde time code to your Google Authenticator.
 *  After select login mutation and type your data and onetime code from Google Authenticator after login button click you can see specific message.
-*  You can also select changing password and user auth feature in the mumations and test them.
+*  You can also select changing password and user auth feature in the mutations and test them.
