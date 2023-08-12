@@ -1,11 +1,8 @@
 import { User, UserDocument } from "../model/user.js";
-import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
-const { sign, verify } = jwt;
-dotenv.config();
+import { signToken, verifyToken } from "../utils/jwt.js";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 
 // User registration with hashing password
 async function register(_, { email, username, password }) {
@@ -22,7 +19,7 @@ async function register(_, { email, username, password }) {
     throw new Error("Username or email already taken");
   }
   // Hash users password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
   try {
     // Generate a random secret key for the user
     const secret = speakeasy.generateSecret();
@@ -60,7 +57,7 @@ async function login(_, { email, password, oneTimeCode }, context) {
   }
 
   // Compare the provided password with the stored hashed password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await comparePassword(password, user.password);
   if (!isPasswordValid) {
     throw new Error("Invalid password");
   }
@@ -77,9 +74,8 @@ async function login(_, { email, password, oneTimeCode }, context) {
   }
 
   // If passwords match, generate a JWT token and return it
-  const token = sign({ userId: user._id }, process.env.SECRET, {
-    expiresIn: "1h",
-  });
+  const token = signToken(user._id);
+
   context.res.cookie("token", token, {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // Cookie expiry time in milliseconds (1 day)
@@ -92,9 +88,7 @@ async function authUser(_, __, context) {
   if (!token) {
     throw new Error("Authorization token missing");
   }
-  const decoded = verify(token, process.env.SECRET) as {
-    userId: string;
-  };
+  const decoded = verifyToken(token);
   if (!decoded.userId) {
     throw new Error("Invalid token payload");
   }
@@ -120,12 +114,12 @@ async function changePassword(_, { email, oldPassword, newPassword }) {
     throw new Error("User not found");
   }
   // Validate the old password
-  const validPassword = await bcrypt.compare(oldPassword, user.password);
+  const validPassword = await comparePassword(oldPassword, user.password);
   if (!validPassword) {
     throw new Error("Invalid password");
   }
   // Hash and save the new password
-  const newHashedPassword = await bcrypt.hash(newPassword, 10);
+  const newHashedPassword = await hashPassword(newPassword);
   user.password = newHashedPassword;
   await user.save();
 
